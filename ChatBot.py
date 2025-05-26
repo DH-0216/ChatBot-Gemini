@@ -1,7 +1,7 @@
 import os
+import google.generativeai as genai
 from PyQt6.QtWidgets import QWidget
 from ui.chatbot_ui import Ui_Form
-import google.generativeai as genai
 from dotenv import load_dotenv
 from PyQt6.QtCore import QThread, pyqtSignal
 
