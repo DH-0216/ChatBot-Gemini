@@ -32,13 +32,29 @@ class ChatBotGUI(QWidget, Ui_Form):
     def __init__(self):
         super().__init__()
         self.setupUi(self)  
-        self.setWindowTitle("AI-Powered Programming ChatBot")
+        self.setWindowTitle("AI-Powered ChatBot")
         self.setGeometry(100, 100, 500, 600)
+        self.textEdit.setReadOnly(True)
         self.pushButton.clicked.connect(self.get_response)
         self.lineEdit.returnPressed.connect(self.get_response) 
         self.load_stylesheet("./assets/chat.qss")
         self.response_thread = None
+        
+        greeting = "Hello! I'm your AI programming assistant. How can I help you today? 😊"
+        self.append_message(greeting, "left")
 
+    
+    def show_typing_indicator(self):  
+        self.append_message("typing ...", "left")
+        self.typing_index = self.textEdit.document().lineCount() - 1
+
+    def remove_typing_indicator(self):
+        cursor = self.textEdit.textCursor()
+        cursor.movePosition(cursor.MoveOperation.End)
+        cursor.select(cursor.SelectionType.LineUnderCursor)
+        cursor.removeSelectedText()
+        cursor.deletePreviousChar()
+        
     # This function is triggered when the user presses the send button or hits Enter.
     def get_response(self):
         user_input = self.lineEdit.text().strip()
@@ -48,11 +64,13 @@ class ChatBotGUI(QWidget, Ui_Form):
         self.lineEdit.clear()
         self.pushButton.setEnabled(False)
         self.lineEdit.setEnabled(False)
+        self.show_typing_indicator()
         self.response_thread = BotResponseThread(user_input)
         self.response_thread.finished.connect(self.handle_bot_reply)
         self.response_thread.start()
 
     def handle_bot_reply(self, bot_reply):
+        self.remove_typing_indicator()
         self.append_message(bot_reply, "left")
         self.pushButton.setEnabled(True)
         self.lineEdit.setEnabled(True)
@@ -60,7 +78,6 @@ class ChatBotGUI(QWidget, Ui_Form):
 
     # This function appends messages to the textEdit widget with appropriate formatting.
     def append_message(self, message, align):
-        """Formats messages for left/right alignment using HTML and CSS classes."""
         if align == "right":
             user_class = "user-message"
             sender = "You"
@@ -72,10 +89,10 @@ class ChatBotGUI(QWidget, Ui_Form):
         
         self.textEdit.append(formatted_message)
         self.textEdit.ensureCursorVisible()
+        self.lineEdit.setFocus()
      
      
     def load_stylesheet(self, filename):
-        """Loads QSS file and applies styles.""" 
         try:
             abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), filename))
             with open(abs_path, "r") as file:
