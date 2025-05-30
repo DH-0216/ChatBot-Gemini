@@ -40,7 +40,7 @@ class ChatBotGUI(QWidget, Ui_Form):
         self.load_stylesheet("./assets/chat.qss")
         self.response_thread = None
         
-        greeting = "Hello! I'm your AI programming assistant. How can I help you today? 😊"
+        greeting = "Hello! I'm your AI assistant. How can I help you today? 😊"
         self.append_message(greeting, "left")
 
     
